@@ -12,24 +12,15 @@ jobs:
       
       - name: Build APK
         run: |
-          # Устанавливаем права на папку
           chmod -R 777 .
-          
-          # Создаём виртуальное окружение и устанавливаем buildozer
           python -m venv venv
           . venv/bin/activate
           pip install --upgrade pip
           pip install buildozer cython
-          
-          # Отключаем проверку root (ВАЖНО!)
           export FORCE_ROOT=1
-          
-          # Инициализируем buildozer (если нет spec файла)
           if [ ! -f buildozer.spec ]; then
             buildozer init
           fi
-          
-          # Собираем APK
           buildozer android debug deploy
       
       - name: Upload APK
