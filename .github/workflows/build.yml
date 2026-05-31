@@ -10,8 +10,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '11'
+          distribution: temurin
+          java-version: 11
       
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -20,12 +20,15 @@ jobs:
       
       - name: Install buildozer
         run: |
-          pip install --upgrade pip
           pip install buildozer
-          sudo apt-get update
           sudo apt-get install -y git zip unzip openjdk-11-jdk autoconf libtool pkg-config
       
-      - name: Build with buildozer
+      - name: Build APK
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/27.3.13750724
+          ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk/27.3.13750724
         run: |
           if [ ! -f buildozer.spec ]; then
             echo '[app]' > buildozer.spec
@@ -37,12 +40,12 @@ jobs:
             echo 'android.permissions = INTERNET, ACCESS_WIFI_STATE, CHANGE_WIFI_STATE' >> buildozer.spec
             echo 'android.api = 30' >> buildozer.spec
             echo 'android.minapi = 21' >> buildozer.spec
-            echo 'android.ndk = 25c' >> buildozer.spec
+            echo 'android.ndk = 27c' >> buildozer.spec
             echo '' >> buildozer.spec
             echo '[buildozer]' >> buildozer.spec
             echo 'log_level = 2' >> buildozer.spec
           fi
-          yes | buildozer android debug deploy || true
+          yes | buildozer android debug deploy
       
       - name: Upload APK
         uses: actions/upload-artifact@v4
