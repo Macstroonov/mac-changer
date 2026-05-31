@@ -43,11 +43,15 @@ jobs:
             echo 'android.api = 30' >> buildozer.spec
             echo 'android.minapi = 21' >> buildozer.spec
             echo 'android.ndk = 27c' >> buildozer.spec
+            echo 'android.accept_sdk_license = True' >> buildozer.spec
             echo '' >> buildozer.spec
             echo '[buildozer]' >> buildozer.spec
             echo 'log_level = 2' >> buildozer.spec
           fi
-          yes | buildozer android debug deploy
+          # Принимаем лицензию один раз
+          echo y | buildozer android update
+          # Собираем
+          buildozer android debug deploy
       
       - name: Upload APK
         uses: actions/upload-artifact@v4
