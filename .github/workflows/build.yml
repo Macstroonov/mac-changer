@@ -21,6 +21,9 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython
           
+          # Отключаем проверку root (ВАЖНО!)
+          export FORCE_ROOT=1
+          
           # Инициализируем buildozer (если нет spec файла)
           if [ ! -f buildozer.spec ]; then
             buildozer init
