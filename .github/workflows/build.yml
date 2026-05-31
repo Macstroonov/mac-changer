@@ -34,12 +34,20 @@ jobs:
           SDK_DIR=/home/runner/.buildozer/android/platform/android-sdk
           mkdir -p $SDK_DIR/cmdline-tools
           mkdir -p $SDK_DIR/tools/bin
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip -d /tmp/sdk-temp
-          cp -r /tmp/sdk-temp/cmdline-tools/* $SDK_DIR/cmdline-tools/
-          ln -sf $SDK_DIR/cmdline-tools/bin/sdkmanager $SDK_DIR/tools/bin/sdkmanager
-          yes | $SDK_DIR/cmdline-tools/bin/sdkmanager --licenses > /dev/null 2>&1
-          $SDK_DIR/cmdline-tools/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" > /dev/null 2>&1
+          
+          # Скачиваем SDK только если его нет
+          if [ ! -f $SDK_DIR/cmdline-tools/bin/sdkmanager ]; then
+            wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+            unzip -q commandlinetools-linux-11076708_latest.zip -d /tmp/sdk-temp
+            cp -r /tmp/sdk-temp/cmdline-tools/* $SDK_DIR/cmdline-tools/
+            ln -sf $SDK_DIR/cmdline-tools/bin/sdkmanager $SDK_DIR/tools/bin/sdkmanager
+          fi
+          
+          # Принимаем лицензии (без ошибок)
+          echo y | $SDK_DIR/cmdline-tools/bin/sdkmanager --licenses || true
+          
+          # Устанавливаем компоненты (без ошибок)
+          echo y | $SDK_DIR/cmdline-tools/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" || true
       
       - name: Build APK
         run: buildozer android debug deploy
