@@ -5,38 +5,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: kivy/buildozer:latest
+      image: kivy/kivy:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
       - name: Build APK
         run: |
-          chmod -R 777 .
-          python -m venv venv
-          . venv/bin/activate
+          apt-get update
+          apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config
           pip install --upgrade pip
           pip install buildozer cython
-          
-          # Отключаем проверку root
-          SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
-          sed -i 's/def check_root(self):/def check_root(self):\n        return/' $SITE_PACKAGES/buildozer/__init__.py
-          
-          # СОЗДАЁМ build-tools папку и ссылку на существующие инструменты
-          export SDK_DIR=/github/home/.buildozer/android/platform/android-sdk
-          mkdir -p $SDK_DIR/build-tools/30.0.3
-          # Копируем aidl из системного пути (если есть)
-          find / -name aidl 2>/dev/null | head -1 | xargs -I {} cp {} $SDK_DIR/build-tools/30.0.3/ || true
-          
+          export FORCE_ROOT=1
           if [ ! -f buildozer.spec ]; then
             buildozer init
           fi
-          
-          # ПАТЧИМ buildozer.spec на лету
-          sed -i 's/# android.accept_sdk_license = False/android.accept_sdk_license = True/' buildozer.spec
-          sed -i 's/android.build_tools = .*/android.build_tools = 30.0.3/' buildozer.spec
-          
-          # СБОРКА
           buildozer android debug deploy
       
       - name: Upload APK
