@@ -31,16 +31,15 @@ jobs:
       
       - name: Configure buildozer
         run: |
-          mkdir -p /home/runner/.buildozer/android/platform/android-sdk
+          SDK_DIR=/home/runner/.buildozer/android/platform/android-sdk
+          mkdir -p $SDK_DIR/cmdline-tools
+          mkdir -p $SDK_DIR/tools/bin
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip -d /home/runner/.buildozer/android/platform/android-sdk
-          mkdir -p /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools
-          mv /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-          mv /home/runner/.buildozer/android/platform/android-sdk/latest /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/
-          mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
-          ln -s /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
-          yes | /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1
-          /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" > /dev/null 2>&1
+          unzip -q commandlinetools-linux-11076708_latest.zip -d /tmp/sdk-temp
+          cp -r /tmp/sdk-temp/cmdline-tools/* $SDK_DIR/cmdline-tools/
+          ln -sf $SDK_DIR/cmdline-tools/bin/sdkmanager $SDK_DIR/tools/bin/sdkmanager
+          yes | $SDK_DIR/cmdline-tools/bin/sdkmanager --licenses > /dev/null 2>&1
+          $SDK_DIR/cmdline-tools/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" > /dev/null 2>&1
       
       - name: Build APK
         run: buildozer android debug deploy
