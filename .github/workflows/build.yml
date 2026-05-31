@@ -18,13 +18,15 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython
           
-          # Отключаем проверку root в buildozer (патч)
+          # Отключаем проверку root
           SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
           sed -i 's/def check_root(self):/def check_root(self):\n        return/' $SITE_PACKAGES/buildozer/__init__.py
           
           if [ ! -f buildozer.spec ]; then
             buildozer init
           fi
+          
+          # Сборка
           buildozer android debug deploy
       
       - name: Upload APK
