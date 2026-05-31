@@ -14,6 +14,6 @@ android.ndk = 23b
 log_level = 2
 
 # ПРИНУДИТЕЛЬНО УКАЗЫВАЕМ ПУТЬ К SDK
-android.sdk_path = /home/runner/android-sdk
-android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r23b
-android.ant_path = /home/runner/.buildozer/android/platform/apache-ant-1.9.4
+# android.sdk_path = /home/runner/android-sdk
+# android.ndk_path = /home/runner/.buildozer/android/platform/android-ndk-r23b
+# 3android.ant_path = /home/runner/.buildozer/android/platform/apache-ant-1.9.4
