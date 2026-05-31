@@ -1,4 +1,5 @@
 [app]
+version = 1.0
 title = MAC Changer
 package.name = macchanger
 package.domain = org.macchanger
