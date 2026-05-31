@@ -4,72 +4,30 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: kivy/buildozer:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-      
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git zip unzip autoconf automake libtool pkg-config wget autoconf-archive
-      
-      - name: Install buildozer
-        run: |
-          pip install --upgrade pip
-          pip install buildozer
-      
-      - name: Setup Android SDK and NDK
-        run: |
-          export SDK_DIR=/home/runner/.buildozer/android/platform/android-sdk
-          mkdir -p $SDK_DIR
-          cd $SDK_DIR
-          
-          # Скачиваем command line tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip
-          
-          # Создаём структуру
-          mkdir -p cmdline-tools
-          mv cmdline-tools latest
-          mkdir -p cmdline-tools
-          mv latest cmdline-tools/
-          
-          # Принимаем лицензии
-          yes | $SDK_DIR/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1
-          
-          # Устанавливаем platform-tools, platform 30, build-tools 30.0.3 и NDK 25c
-          $SDK_DIR/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "ndk;25.2.9519653"
-          
-          # Создаём символическую ссылку
-          mkdir -p $SDK_DIR/tools/bin
-          ln -sf $SDK_DIR/cmdline-tools/latest/bin/sdkmanager $SDK_DIR/tools/bin/sdkmanager
-          
-          # Создаём ссылку на NDK
-          ln -sf $SDK_DIR/ndk/25.2.9519653 /home/runner/.buildozer/android/platform/android-ndk-r25c
-      
-      - name: Clean buildozer cache
-        run: |
-          rm -rf ~/.buildozer/cache
-          rm -rf ~/.buildozer/android/platform/build-*
-      
       - name: Build APK
-        run: buildozer android debug deploy
-        env:
-          ANDROID_HOME: /home/runner/.buildozer/android/platform/android-sdk
-          ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
-          ANDROID_NDK_HOME: /home/runner/.buildozer/android/platform/android-ndk-r25c
-          ANDROID_NDK_ROOT: /home/runner/.buildozer/android/platform/android-ndk-r25c
+        run: |
+          # Устанавливаем права на папку
+          chmod -R 777 .
+          
+          # Создаём виртуальное окружение и устанавливаем buildozer
+          python -m venv venv
+          . venv/bin/activate
+          pip install --upgrade pip
+          pip install buildozer cython
+          
+          # Инициализируем buildozer (если нет spec файла)
+          if [ ! -f buildozer.spec ]; then
+            buildozer init
+          fi
+          
+          # Собираем APK
+          buildozer android debug deploy
       
       - name: Upload APK
         uses: actions/upload-artifact@v4
