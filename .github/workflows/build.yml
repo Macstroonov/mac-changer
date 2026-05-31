@@ -22,7 +22,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip autoconf libtool pkg-config wget
+          sudo apt-get install -y git zip unzip autoconf automake libtool pkg-config wget autoconf-archive
       
       - name: Install buildozer
         run: |
@@ -57,10 +57,11 @@ jobs:
           
           # Создаём ссылку на NDK 28c
           ln -sf $SDK_DIR/ndk/28.0.13004108 /home/runner/.buildozer/android/platform/android-ndk-r28c
-          
-          # Проверяем установку
-          ls -la $SDK_DIR/build-tools/
-          ls -la $SDK_DIR/ndk/
+      
+      - name: Clean buildozer cache
+        run: |
+          rm -rf ~/.buildozer/cache
+          rm -rf ~/.buildozer/android/platform/build-*
       
       - name: Build APK
         run: buildozer android debug deploy
