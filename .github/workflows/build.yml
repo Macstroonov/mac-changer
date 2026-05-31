@@ -1,15 +1,31 @@
 name: Build APK
-on: push
+on: [push]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-      - run: pip install buildozer
-      - run: buildozer init
-      - run: buildozer android debug deploy
-      - uses: actions/upload-artifact@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          name: apk
+          python-version: '3.11'
+      
+      - name: Install buildozer
+        run: |
+          pip install --upgrade pip
+          pip install buildozer
+      
+      - name: Initialize buildozer
+        run: buildozer init
+      
+      - name: Build APK
+        run: buildozer android debug deploy
+      
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-changer-apk
           path: bin/*.apk
