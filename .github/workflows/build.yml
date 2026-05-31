@@ -48,21 +48,27 @@ jobs:
           # Принимаем лицензии
           yes | $SDK_DIR/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1
           
-          # Устанавливаем компоненты
-          $SDK_DIR/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;37.0.0"
+          # Устанавливаем компоненты (включая NDK 28c)
+          $SDK_DIR/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;37.0.0" "ndk;28.0.13004108"
           
           # Создаём символическую ссылку для Buildozer
           mkdir -p $SDK_DIR/tools/bin
           ln -sf $SDK_DIR/cmdline-tools/latest/bin/sdkmanager $SDK_DIR/tools/bin/sdkmanager
           
+          # Создаём ссылку на NDK 28c
+          ln -sf $SDK_DIR/ndk/28.0.13004108 /home/runner/.buildozer/android/platform/android-ndk-r28c
+          
           # Проверяем установку
           ls -la $SDK_DIR/build-tools/
+          ls -la $SDK_DIR/ndk/
       
       - name: Build APK
         run: buildozer android debug deploy
         env:
           ANDROID_HOME: /home/runner/.buildozer/android/platform/android-sdk
           ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
+          ANDROID_NDK_HOME: /home/runner/.buildozer/android/platform/android-ndk-r28c
+          ANDROID_NDK_ROOT: /home/runner/.buildozer/android/platform/android-ndk-r28c
       
       - name: Upload APK
         uses: actions/upload-artifact@v4
