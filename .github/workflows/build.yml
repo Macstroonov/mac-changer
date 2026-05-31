@@ -20,19 +20,12 @@ jobs:
           java-version: '17'
       
       - name: Setup Android SDK
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget unzip
-          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk
-          mkdir -p $HOME/android-sdk/cmdline-tools/latest
-          mv $HOME/android-sdk/cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest/
-          echo "y" | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses
-          echo "y" | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk "platform-tools" "platforms;android-30" "build-tools;30.0.3"
+        uses: android-actions/setup-android@v3
       
       - name: Install system dependencies
         run: |
-          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip autoconf libtool pkg-config
       
       - name: Install buildozer
         run: |
@@ -42,8 +35,8 @@ jobs:
       - name: Build APK
         run: buildozer android debug deploy
         env:
-          ANDROID_HOME: $HOME/android-sdk
-          ANDROID_SDK_ROOT: $HOME/android-sdk
+          ANDROID_HOME: $ANDROID_HOME
+          ANDROID_SDK_ROOT: $ANDROID_HOME
       
       - name: Upload APK
         uses: actions/upload-artifact@v4
