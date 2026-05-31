@@ -29,7 +29,7 @@ jobs:
           pip install --upgrade pip
           pip install buildozer
       
-      - name: Setup Android SDK manually
+      - name: Setup Android SDK and NDK
         run: |
           export SDK_DIR=/home/runner/.buildozer/android/platform/android-sdk
           mkdir -p $SDK_DIR
@@ -39,7 +39,7 @@ jobs:
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
           unzip -q commandlinetools-linux-11076708_latest.zip
           
-          # Создаём правильную структуру
+          # Создаём структуру
           mkdir -p cmdline-tools
           mv cmdline-tools latest
           mkdir -p cmdline-tools
@@ -48,15 +48,15 @@ jobs:
           # Принимаем лицензии
           yes | $SDK_DIR/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1
           
-          # Устанавливаем компоненты (включая NDK 28c)
-          $SDK_DIR/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;37.0.0" "ndk;28.0.13004108"
+          # Устанавливаем platform-tools, platform 30, build-tools 30.0.3 и NDK 25c
+          $SDK_DIR/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "ndk;25.2.9519653"
           
-          # Создаём символическую ссылку для Buildozer
+          # Создаём символическую ссылку
           mkdir -p $SDK_DIR/tools/bin
           ln -sf $SDK_DIR/cmdline-tools/latest/bin/sdkmanager $SDK_DIR/tools/bin/sdkmanager
           
-          # Создаём ссылку на NDK 28c
-          ln -sf $SDK_DIR/ndk/28.0.13004108 /home/runner/.buildozer/android/platform/android-ndk-r28c
+          # Создаём ссылку на NDK
+          ln -sf $SDK_DIR/ndk/25.2.9519653 /home/runner/.buildozer/android/platform/android-ndk-r25c
       
       - name: Clean buildozer cache
         run: |
@@ -68,8 +68,8 @@ jobs:
         env:
           ANDROID_HOME: /home/runner/.buildozer/android/platform/android-sdk
           ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
-          ANDROID_NDK_HOME: /home/runner/.buildozer/android/platform/android-ndk-r28c
-          ANDROID_NDK_ROOT: /home/runner/.buildozer/android/platform/android-ndk-r28c
+          ANDROID_NDK_HOME: /home/runner/.buildozer/android/platform/android-ndk-r25c
+          ANDROID_NDK_ROOT: /home/runner/.buildozer/android/platform/android-ndk-r25c
       
       - name: Upload APK
         uses: actions/upload-artifact@v4
